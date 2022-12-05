@@ -105,16 +105,12 @@ func main() {
 
 	/*--------------REST API--------------*/
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
 
 	v1 := r.Group("/v1")
 	{
 		restaurants := v1.Group("/restaurants")
 		{
+			//Create restaurant
 			restaurants.POST("", func(c *gin.Context) {
 				var newData RestaurantCreate
 
@@ -131,6 +127,7 @@ func main() {
 				c.JSON(http.StatusOK, gin.H{"data": newData.Id})
 			})
 
+			//Get restaurant
 			restaurants.GET("/:id", func(c *gin.Context) {
 				var data Restaurant
 
@@ -149,6 +146,7 @@ func main() {
 				c.JSON(http.StatusOK, gin.H{"data": data})
 			})
 
+			//Get restaurants
 			restaurants.GET("", func(c *gin.Context) {
 				var data []Restaurant
 
@@ -168,14 +166,59 @@ func main() {
 					paging.Page = 1
 				}
 
+				if paging.Limit <= 0 {
+					paging.Limit = 10
+				}
+
 				offset := (paging.Page - 1) * paging.Limit
 
-				if err := db.Offset(offset).Limit(paging.Limit).Order("id desc").Find(&data).Error; err != nil {
+				if err := db.Offset(offset).Limit(paging.Limit).Order("id asc").Find(&data).Error; err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 					return
 				}
 
 				c.JSON(http.StatusOK, gin.H{"data": data})
+			})
+
+			//Update restaurant
+			restaurants.PUT("/:id", func(c *gin.Context) {
+				id, err := strconv.Atoi(c.Param("id"))
+
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+
+				var data RestaurantUpdate
+
+				if err := c.ShouldBind(&data); err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+
+				if err := db.Where("id = ?", id).Updates(&data).Error; err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+					return
+				}
+
+				c.JSON(http.StatusOK, gin.H{"data": true})
+			})
+
+			//Delete restaurant
+			restaurants.DELETE("/:id", func(c *gin.Context) {
+				id, err := strconv.Atoi(c.Param("id"))
+
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+
+				if err := db.Table(Restaurant{}.TableName()).Where("id = ?", id).Delete(nil).Error; err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+					return
+				}
+
+				c.JSON(http.StatusOK, gin.H{"data": true})
 			})
 		}
 	}
