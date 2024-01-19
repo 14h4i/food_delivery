@@ -2,39 +2,17 @@ package main
 
 import (
 	"fmt"
-	"food_delivery/common"
 	"food_delivery/component/appctx"
 	restaurantgin "food_delivery/modules/restaurant/transport/gin"
+	uploadgin "food_delivery/modules/upload/transport/gin"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
-
-type Restaurant struct {
-	common.SQLModel
-	Name    string `json:"name" gorm:"column:name;"`
-	Address string `json:"address" gorm:"column:addr;"`
-}
-
-func (Restaurant) TableName() string { return "restaurants" }
-
-type RestaurantCreate struct {
-	common.SQLModel
-	Name    string `json:"name" gorm:"column:name;"`
-	Address string `json:"address" gorm:"column:addr;"`
-}
-
-func (RestaurantCreate) TableName() string { return Restaurant{}.TableName() }
-
-type RestaurantUpdate struct {
-	Name    *string `json:"name" gorm:"column:name;"`
-	Address *string `json:"address" gorm:"column:addr;"`
-}
-
-func (RestaurantUpdate) TableName() string { return Restaurant{}.TableName() }
 
 func main() {
 	fmt.Println("hello")
@@ -50,8 +28,18 @@ func main() {
 
 	r := gin.Default()
 
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+	r.Static("/static", "./static")
+
 	v1 := r.Group("/v1")
 	{
+		v1.POST("/upload", uploadgin.UploadImage(appCtx))
+
 		restaurants := v1.Group("/restaurants")
 		{
 			//Create restaurant
@@ -71,6 +59,6 @@ func main() {
 		}
 	}
 
-	r.Run()
+	r.Run("localhost:3000")
 
 }
