@@ -39,14 +39,16 @@ func UploadImage(appCtx appctx.AppContext) func(*gin.Context) {
 		}
 
 		//imgStore
-		biz := uploadbiz.NewUploadBiz(appCtx.UploadProvider(), nil)
+		biz := uploadbiz.NewUploadBiz(appCtx.UploadProvider())
 		img, err := biz.Upload(c.Request.Context(), dataBytes, folder, fileHeader.Filename)
 
 		if err != nil {
 			panic(err)
 		}
 
-		c.JSON(200, gin.H{})
+		img.FulFill(appCtx.UploadProvider().GetDomain())
+
+		c.JSON(200, gin.H{"data": img})
 
 	}
 }

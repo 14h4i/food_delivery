@@ -7,6 +7,7 @@ import (
 	"food_delivery/common"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -74,9 +75,25 @@ func (provider *s3Provider) SaveFileUploaded(ctx context.Context, data []byte, d
 	}
 
 	img := &common.Image{
-		Url:       fmt.Sprintf("%s/%s", provider.domain, dst),
+		Url:       dst,
 		CloudName: "s3",
 	}
 
 	return img, nil
+}
+
+func (provider *s3Provider) GetUploadPresignedURL(ctx context.Context) string {
+	req, _ := s3.New(provider.session).PutObjectRequest(&s3.PutObjectInput{
+		Bucket: aws.String(provider.bucketName),
+		Key:    aws.String(fmt.Sprintf("img/%d", time.Now().UnixNano())),
+		ACL:    aws.String("private"),
+	})
+
+	url, _ := req.Presign(60 * time.Second)
+
+	return url
+}
+
+func (provider *s3Provider) GetDomain() string {
+	return provider.domain
 }

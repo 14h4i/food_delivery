@@ -20,6 +20,10 @@ func (Image) TableName() string {
 	return "images"
 }
 
+func (j *Image) FulFill(domain string) {
+	j.Url = fmt.Sprintf("%s/%s", domain, j.Url)
+}
+
 func (j *Image) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 

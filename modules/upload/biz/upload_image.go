@@ -48,7 +48,7 @@ func (biz *uploadBiz) Upload(ctx context.Context, data []byte, folder, fileName 
 	fileExt := filepath.Ext(fileName)                              // "img.jpg" => ".jpg"
 	fileName = fmt.Sprintf("%d%s", time.Now().UnixNano(), fileExt) // 1203981028930.jpg
 
-	img, err := biz.provider.SaveFileUploaded(ctx, data, fmt.Sprintf("%s/%s", time.Now().UnixNano(), folder, fileName))
+	img, err := biz.provider.SaveFileUploaded(ctx, data, fmt.Sprintf("%s/%s", folder, fileName))
 
 	if err != nil {
 		return nil, errors.New("cannot save file")
