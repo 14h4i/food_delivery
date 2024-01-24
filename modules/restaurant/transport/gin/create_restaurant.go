@@ -1,6 +1,7 @@
 package restaurantgin
 
 import (
+	"food_delivery/common"
 	"food_delivery/component/appctx"
 	restaurantbiz "food_delivery/modules/restaurant/biz"
 	restaurantmodel "food_delivery/modules/restaurant/model"
@@ -15,8 +16,7 @@ func CreateRestaurant(appCtx appctx.AppContext) func(*gin.Context) {
 		var newData restaurantmodel.RestaurantCreate
 
 		if err := c.ShouldBind(&newData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		// Dependencies install
@@ -24,10 +24,9 @@ func CreateRestaurant(appCtx appctx.AppContext) func(*gin.Context) {
 		biz := restaurantbiz.NewCreateRestaurantBiz(store)
 
 		if err := biz.CreateNewRestaurant(c.Request.Context(), &newData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(err)
 		}
 
-		c.JSON(http.StatusOK, gin.H{"data": newData.Id})
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(newData.Id))
 	}
 }

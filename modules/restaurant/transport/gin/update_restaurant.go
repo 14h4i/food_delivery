@@ -1,6 +1,7 @@
 package restaurantgin
 
 import (
+	"food_delivery/common"
 	"food_delivery/component/appctx"
 	restaurantbiz "food_delivery/modules/restaurant/biz"
 	restaurantmodel "food_delivery/modules/restaurant/model"
@@ -16,15 +17,13 @@ func UpdateRestaurant(appCtx appctx.AppContext) func(*gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		var data restaurantmodel.RestaurantUpdate
 
 		if err := c.ShouldBind(&data); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		// Dependencies install
@@ -32,10 +31,9 @@ func UpdateRestaurant(appCtx appctx.AppContext) func(*gin.Context) {
 		biz := restaurantbiz.NewUpdateRestaurantBiz(store)
 
 		if err := biz.UpdateRestaurant(c.Request.Context(), id, &data); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(err)
 		}
 
-		c.JSON(http.StatusOK, gin.H{"data": true})
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }

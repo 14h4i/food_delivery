@@ -1,5 +1,9 @@
 package common
 
-import "errors"
+import "fmt"
 
-var ErrDataNotFound = errors.New("data not found")
+func Recovery() {
+	if err := recover(); err != nil {
+		fmt.Println("Recovered from ", err)
+	}
+}

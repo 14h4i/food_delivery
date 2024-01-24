@@ -23,7 +23,7 @@ func (s *sqlStore) ListDataWithCondition(
 	db = db.Where("status not in (0)")
 
 	if err := db.Table(restaurantmodel.Restaurant{}.TableName()).Count(&paging.Total).Error; err != nil {
-		return nil, err
+		return nil, common.ErrDB(err)
 	}
 
 	offset := (paging.Page - 1) * paging.Limit
@@ -33,7 +33,7 @@ func (s *sqlStore) ListDataWithCondition(
 		Offset(offset).
 		Order("id asc").
 		Find(&result).Error; err != nil {
-		return nil, err
+		return nil, common.ErrDB(err)
 	}
 
 	return result, nil

@@ -1,6 +1,7 @@
 package restaurantgin
 
 import (
+	"food_delivery/common"
 	"food_delivery/component/appctx"
 	restaurantbiz "food_delivery/modules/restaurant/biz"
 	restaurantstorage "food_delivery/modules/restaurant/storage"
@@ -15,8 +16,7 @@ func DeleteRestaurant(appCtx appctx.AppContext) func(*gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		// Dependencies install
@@ -24,10 +24,9 @@ func DeleteRestaurant(appCtx appctx.AppContext) func(*gin.Context) {
 		biz := restaurantbiz.NewDeleteRestaurantBiz(store)
 
 		if err := biz.DeleteRestaurant(c.Request.Context(), id); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(err)
 		}
 
-		c.JSON(http.StatusOK, gin.H{"data": true})
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }

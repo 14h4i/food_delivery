@@ -2,7 +2,6 @@ package restaurantbiz
 
 import (
 	"context"
-	"errors"
 	"food_delivery/common"
 	restaurantmodel "food_delivery/modules/restaurant/model"
 )
@@ -33,15 +32,15 @@ func (biz *deleteRestaurantBiz) DeleteRestaurant(ctx context.Context, id int) er
 	oldData, err := biz.store.FindDataWithCondition(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
-		if err == common.ErrDataNotFound {
-			return errors.New("data not found")
+		if err == common.ErrRecordNotFound {
+			return common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
 		}
 
-		return err
+		return common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
 	}
 
 	if oldData.Status == 0 {
-		return errors.New("data has been deleted")
+		return common.ErrEntityDeleted(restaurantmodel.EntityName, restaurantmodel.ErrRestaurantDeleted)
 	}
 
 	zero := 0
@@ -49,7 +48,7 @@ func (biz *deleteRestaurantBiz) DeleteRestaurant(ctx context.Context, id int) er
 	if err := biz.store.Update(ctx,
 		map[string]interface{}{"id": id},
 		&restaurantmodel.RestaurantUpdate{Status: &zero}); err != nil {
-		return err
+		return common.ErrCannotDeleteEntity(restaurantmodel.EntityName, err)
 	}
 
 	return nil

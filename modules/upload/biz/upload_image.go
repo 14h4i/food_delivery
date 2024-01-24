@@ -3,7 +3,6 @@ package uploadbiz
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"food_delivery/common"
 	"image"
@@ -15,10 +14,6 @@ import (
 	"strings"
 	"time"
 )
-
-// type CreateImageStorage interface {
-// 	CreateImage(context context.Context, data *common.Image) error
-// }
 
 type UploadProvider interface {
 	SaveFileUploaded(ctx context.Context, data []byte, dst string) (*common.Image, error)
@@ -38,7 +33,7 @@ func (biz *uploadBiz) Upload(ctx context.Context, data []byte, folder, fileName 
 	w, h, err := getImageDimesion(fileBytes)
 
 	if err != nil {
-		return nil, errors.New("file is not image")
+		return nil, common.ErrInvalidRequest(common.ErrNotImage)
 	}
 
 	if strings.TrimSpace(folder) == "" {
@@ -51,12 +46,11 @@ func (biz *uploadBiz) Upload(ctx context.Context, data []byte, folder, fileName 
 	img, err := biz.provider.SaveFileUploaded(ctx, data, fmt.Sprintf("%s/%s", folder, fileName))
 
 	if err != nil {
-		return nil, errors.New("cannot save file")
+		return nil, common.ErrInternal(common.ErrCanNotSaveFile)
 	}
 
 	img.Width = w
 	img.Height = h
-	// img.CloudName = "s3"
 	img.Extension = fileExt
 
 	return img, nil

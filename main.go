@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"food_delivery/component/appctx"
 	"food_delivery/component/uploadprovider"
+	"food_delivery/middleware"
 	restaurantgin "food_delivery/modules/restaurant/transport/gin"
 	uploadgin "food_delivery/modules/upload/transport/gin"
 	"log"
@@ -36,6 +37,7 @@ func main() {
 	appCtx := appctx.NewAppContext(db, s3Provider)
 
 	r := gin.Default()
+	r.Use(middleware.Recover(appCtx))
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

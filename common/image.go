@@ -7,6 +7,11 @@ import (
 	"fmt"
 )
 
+var (
+	ErrNotImage       = errors.New("file is not image")
+	ErrCanNotSaveFile = errors.New("cannot save file")
+)
+
 type Image struct {
 	Id        int    `json:"id" gorm:"column:id;"`
 	Url       string `json:"url" gorm:"column:url;"`

@@ -2,6 +2,7 @@ package restaurantbiz
 
 import (
 	"context"
+	"food_delivery/common"
 	restaurantmodel "food_delivery/modules/restaurant/model"
 )
 
@@ -26,7 +27,7 @@ func (biz *getRestaurantBiz) GetRestaurant(ctx context.Context, id int) (*restau
 	result, err := biz.store.FindDataWithCondition(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
-		return nil, err
+		return nil, common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
 	}
 
 	return result, nil

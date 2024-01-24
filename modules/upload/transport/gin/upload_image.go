@@ -1,9 +1,9 @@
 package uploadgin
 
 import (
+	"food_delivery/common"
 	"food_delivery/component/appctx"
 	uploadbiz "food_delivery/modules/upload/biz"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,9 +13,7 @@ func UploadImage(appCtx appctx.AppContext) func(*gin.Context) {
 		fileHeader, err := c.FormFile("file")
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-
-			return
+			panic(err)
 		}
 
 		folder := c.DefaultPostForm("folder", "img")
@@ -23,9 +21,7 @@ func UploadImage(appCtx appctx.AppContext) func(*gin.Context) {
 		file, err := fileHeader.Open()
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-
-			return
+			panic(err)
 		}
 
 		defer file.Close() // we can close here
@@ -33,9 +29,7 @@ func UploadImage(appCtx appctx.AppContext) func(*gin.Context) {
 		dataBytes := make([]byte, fileHeader.Size)
 
 		if _, err := file.Read(dataBytes); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-
-			return
+			panic(err)
 		}
 
 		//imgStore
@@ -48,7 +42,7 @@ func UploadImage(appCtx appctx.AppContext) func(*gin.Context) {
 
 		img.FulFill(appCtx.UploadProvider().GetDomain())
 
-		c.JSON(200, gin.H{"data": img})
+		c.JSON(200, common.SimpleSuccessResponse(img))
 
 	}
 }

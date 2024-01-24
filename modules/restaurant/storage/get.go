@@ -19,9 +19,9 @@ func (s *sqlStore) FindDataWithCondition(
 
 	if err := db.Where(cond).First(&data).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, common.ErrDataNotFound
+			return nil, common.ErrRecordNotFound
 		}
-		return nil, err
+		return nil, common.ErrDB(err)
 	}
 
 	return &data, nil
