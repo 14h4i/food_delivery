@@ -7,6 +7,7 @@ import (
 	"food_delivery/middleware"
 	restaurantgin "food_delivery/modules/restaurant/transport/gin"
 	uploadgin "food_delivery/modules/upload/transport/gin"
+	usergin "food_delivery/modules/user/transport/gin"
 	"log"
 	"net/http"
 	"os"
@@ -51,6 +52,8 @@ func main() {
 		v1.GET("/presigned-upload-url", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"data": s3Provider.GetUploadPresignedURL(c.Request.Context())})
 		})
+
+		v1.POST("/register", usergin.Register(appCtx))
 
 		restaurants := v1.Group("/restaurants")
 		{

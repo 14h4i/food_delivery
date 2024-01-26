@@ -4,6 +4,7 @@ import "fmt"
 
 const (
 	DbTypeRestaurant = 1
+	DbTypeUser       = 2
 )
 
 func Recovery() {
