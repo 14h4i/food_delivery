@@ -1,5 +1,11 @@
 package tokenprovider
 
+import (
+	"errors"
+	"food_delivery/common"
+	"time"
+)
+
 type Provider interface {
 	Generate(data TokenPayload, expiry int) (*Token, error)
 	Validate(token string) (*TokenPayload, error)
@@ -7,22 +13,29 @@ type Provider interface {
 
 var (
 	ErrNotFound = common.NewCustomError(
-		erors.New("token not found"),
+		errors.New("token not found"),
 		"token not found",
 		"ErrNotFound",
-	),
-	
+	)
 	ErrEncodingToken = common.NewCustomError(
-		erors.New("error encoding token"),
+		errors.New("error encoding token"),
 		"error encoding token",
 		"ErrEncodingToken",
-	),
-
+	)
 	ErrInvalidToken = common.NewCustomError(
-		erors.New("invalid token provided"),
+		errors.New("invalid token provided"),
 		"invalid token provided",
 		"ErrInvalidToken provided",
-	),
-
-	
+	)
 )
+
+type Token struct {
+	Token   string    `json:"token"`
+	Created time.Time `json:"created"`
+	Expiry  int       `json:"expiry"`
+}
+
+type TokenPayload struct {
+	UserId int    `json:"user_id"`
+	Role   string `json:"role"`
+}

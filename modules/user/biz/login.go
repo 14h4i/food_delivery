@@ -3,6 +3,7 @@ package userbiz
 import (
 	"context"
 	"food_delivery/common"
+	"food_delivery/component/tokenprovider"
 	usermodel "food_delivery/modules/user/model"
 )
 
@@ -12,7 +13,7 @@ type LoginStorage interface {
 
 type LoginBiz struct {
 	storeUser     LoginStorage
-	tokenProvider tokenProvider.Provider
+	tokenProvider tokenprovider.Provider
 	hasher        Hasher
 	expiry        int
 }
@@ -31,7 +32,7 @@ func NewLoginBiz(
 	}
 }
 
-func (biz *LoginBiz) Login(ctx context.Context, data *usermodel.UserLogin) (*usermodel.UserLogin, error) {
+func (biz *LoginBiz) Login(ctx context.Context, data *usermodel.UserLogin) (*tokenprovider.Token, error) {
 	user, err := biz.storeUser.FindUser(ctx, map[string]interface{}{"email": data.Email})
 
 	if err != nil {
@@ -54,6 +55,14 @@ func (biz *LoginBiz) Login(ctx context.Context, data *usermodel.UserLogin) (*use
 	if err != nil {
 		return nil, common.ErrInternal(err)
 	}
+
+	// refrestToken, err := biz.tokenProvider.Generate(payload, biz.expiry*2)
+
+	// if err != nil {
+	// 	return nil, common.ErrInternal(err)
+	// }
+
+	// account := usermodel.NewAccount(accessToken.Token, refrestToken.Token)
 
 	return accessToken, nil
 }
