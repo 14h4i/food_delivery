@@ -7,6 +7,8 @@ const (
 	DbTypeUser       = 2
 )
 
+const CurrentUser = "user"
+
 func Recovery() {
 	if err := recover(); err != nil {
 		fmt.Println("Recovered from ", err)

@@ -13,7 +13,11 @@
       "env": {
         "DB_CONN_STR": "root:khaipg@tcp(127.0.0.1:3306)/food_delivery?charset=utf8mb4&parseTime=True&loc=Local",
         "S3BucketName": "food-delivery-pg-images",
-        "S3Region": "ap-southeast-2"
+        "S3Region": "ap-southeast-2",
+        "S3APIKey": "AKIAQCGW3HVAHVPOV6OK",
+        "S3SecretKey": "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",
+        "S3Domain": "https://d2fyb5uo10rbx5.cloudfront.net",
+        "SYSTEM_SECRET": "---"
       }
     }
   ]
