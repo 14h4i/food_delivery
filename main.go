@@ -7,6 +7,7 @@ import (
 	"food_delivery/middleware"
 	restaurantgin "food_delivery/modules/restaurant/transport/gin"
 	uploadgin "food_delivery/modules/upload/transport/gin"
+	userstorage "food_delivery/modules/user/storage"
 	usergin "food_delivery/modules/user/transport/gin"
 	"log"
 	"net/http"
@@ -37,6 +38,7 @@ func main() {
 	s3Provider := uploadprovider.NewS3Provider(s3BucketName, s3Region, s3APIKey, s3SecretKey, s3Domain)
 
 	appCtx := appctx.NewAppContext(db, s3Provider, secretKey)
+	authStore := userstorage.NewSQLStore(appCtx.GetMainDBConnection())
 
 	r := gin.Default()
 	r.Use(middleware.Recover(appCtx))
@@ -56,8 +58,9 @@ func main() {
 
 		v1.POST("/register", usergin.Register(appCtx))
 		v1.POST("/authenticate", usergin.Login(appCtx))
+		v1.GET("/profile", middleware.RequiredAuth(appCtx, authStore), usergin.Profile(appCtx))
 
-		restaurants := v1.Group("/restaurants")
+		restaurants := v1.Group("/restaurants", middleware.RequiredAuth(appCtx, authStore))
 		{
 			//Create restaurant
 			restaurants.POST("", restaurantgin.CreateRestaurant(appCtx))

@@ -14,3 +14,9 @@ func Recovery() {
 		fmt.Println("Recovered from ", err)
 	}
 }
+
+type Requester interface {
+	GetUserId() int
+	GetEmail() string
+	GetRole() string
+}
